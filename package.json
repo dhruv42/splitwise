@@ -19,6 +19,7 @@
   "homepage": "https://github.com/dhruv42/splitwise#readme",
   "dependencies": {
     "express": "^4.17.1",
+    "joi": "^17.4.2",
     "mongoose": "^6.0.11"
   }
 }

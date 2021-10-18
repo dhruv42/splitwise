@@ -6,16 +6,16 @@ const add = async (req, res) => {
     try {
         const createdGroup = await Group.create(req.body);
         const expenseObject = {
-            groupId:createdGroup.id,
-            userDetails:{},
-            singleUser:false
+            groupId: createdGroup.id,
+            userDetails: {},
+            singleUser: false
         }
-        for(const u of req.body.users) {
+        for (const u of req.body.users) {
             expenseObject.userDetails[u] = {
-                expense:0
+                expense: 0
             };
         }
-        
+
         await Expense.create(expenseObject);
         return res.status(statusCode.OK).json({ message: 'group added successfully' });
     } catch (error) {
@@ -26,11 +26,20 @@ const add = async (req, res) => {
 const addUserToTheGroup = async (req, res) => {
     try {
         const { groupId } = req.params;
+        const { userId } = req.body;
+
+        if (!groupId) {
+            throw new Error('groupId is required');
+        }
+
+        if (!userId) {
+            throw new Error('userId is required');
+        }
 
         //check for user in both the collection
         const [group, expenseObject] = await Promise.all([
             Group.findById(groupId),
-            Expense.findOne({groupId})
+            Expense.findOne({ groupId })
         ])
 
         if (!group || !expenseObject) {
@@ -38,20 +47,20 @@ const addUserToTheGroup = async (req, res) => {
         }
 
         // add new user in both the collection
-        group.users.push(req.body.userId);
+        group.users.push(userId);
         Expense.userDetails[userId] = {
-            expense:0
+            expense: 0
         };
 
         // update both
         await Promise.all([
             Group.findOneAndUpdate({ _id: groupId }, group),
-            Expense.findOneAndUpdate({groupId}, Expense)
+            Expense.findOneAndUpdate({ groupId }, Expense)
         ]);
 
         return res.status(statusCode.OK).json({ message: 'user added to the group succussfully' });
     } catch (error) {
-        throw new Error(error.message);
+        return res.status(statusCode.BAD_REQUEST).json({ message: error.message });
     }
 }
 

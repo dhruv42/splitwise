@@ -71,6 +71,10 @@ const add = async (req, res) => {
             return res.status(statusCode.CREATED).json({ message: 'Expense added!' });
         }
 
+        if(!groupId) {
+            throw new Error('groupId is required');
+        }
+
         // group transaction
         [expense, group] = await Promise.all([
             Expense.findOne({ groupId }),
