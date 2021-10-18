@@ -48,14 +48,14 @@ const addUserToTheGroup = async (req, res) => {
 
         // add new user in both the collection
         group.users.push(userId);
-        Expense.userDetails[userId] = {
+        expenseObject.userDetails[userId] = {
             expense: 0
         };
 
         // update both
         await Promise.all([
             Group.findOneAndUpdate({ _id: groupId }, group),
-            Expense.findOneAndUpdate({ groupId }, Expense)
+            Expense.findOneAndUpdate({ groupId }, expenseObject)
         ]);
 
         return res.status(statusCode.OK).json({ message: 'user added to the group succussfully' });
