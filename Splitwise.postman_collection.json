@@ -1,0 +1,175 @@
+{
+	"info": {
+		"_postman_id": "526bbf6c-7132-47c7-b00d-4e88245f4693",
+		"name": "Splitwise",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Add user",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"userName\":\"dhruv1\",\n    \"email\":\"dhruv1@gmail.com\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/user/add",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"user",
+						"add"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add group",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"users\":[\"616d61b7c88e8367f4417889\",\"616d62cd950780536e662044\"],\n    \"name\":\"Lonavala\",\n    \"description\":\"Trip to Lonavala\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/group/add",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"group",
+						"add"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add expense",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"amount\":300,\n    \"payee\":\"616dccaa4c5bf02c40fb1172\",\n    \"payers\":[\"616dccaa4c5bf02c40fb1172\",\"616d62cd950780536e662044\",\"616d61b7c88e8367f4417889\"],\n    \"splitEqually\":true,\n    \"groupId\":\"616dcd878010c4bb0ff31b7d\",\n    \"singleUser\":false\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/expense/add",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"expense",
+						"add"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add user to the group",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"userId\":\"616dccaa4c5bf02c40fb1172\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/group/user/add/:groupId",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"group",
+						"user",
+						"add",
+						":groupId"
+					],
+					"variable": [
+						{
+							"key": "groupId",
+							"value": "616dcd878010c4bb0ff31b7d"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get user expense",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/api/expense/user/:userId?skip=0&limit=10",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"expense",
+						"user",
+						":userId"
+					],
+					"query": [
+						{
+							"key": "skip",
+							"value": "0"
+						},
+						{
+							"key": "limit",
+							"value": "10"
+						}
+					],
+					"variable": [
+						{
+							"key": "userId",
+							"value": "616d62cd950780536e662044"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
