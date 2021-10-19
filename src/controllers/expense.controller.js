@@ -1,6 +1,7 @@
 const Expense = require('../models/expense.model');
 const Transaction = require('../models/transaction.model');
 const Group = require('../models/group.model');
+const User = require('../models/user.model');
 const { messages, statusCode } = require('../constants');
 
 const add = async (req, res) => {
@@ -12,9 +13,9 @@ const add = async (req, res) => {
         if (singleUser) {
             const payerId = payers.find((user) => user !== payee);
 
-            let payerAmount = (amount/2);
-            if(percentageSplit.length) {
-                payerAmount = (amount*percentageSplit[1])/100;
+            let payerAmount = (amount / 2);
+            if (percentageSplit.length) {
+                payerAmount = (amount * percentageSplit[1]) / 100;
             }
 
             expense = await Expense.findOne({
@@ -56,7 +57,7 @@ const add = async (req, res) => {
                 expense.userDetails[payerId][payee] -= payerAmount;
                 expense.userDetails[payerId].expense += 0;
 
-                await Expense.updateOne({ id: expense.id }, {userDetails:expense.userDetails});
+                await Expense.updateOne({ id: expense.id }, { userDetails: expense.userDetails });
 
             }
             Transaction.create({
@@ -71,7 +72,7 @@ const add = async (req, res) => {
             return res.status(statusCode.CREATED).json({ message: 'Expense added!' });
         }
 
-        if(!groupId) {
+        if (!groupId) {
             throw new Error('groupId is required');
         }
 
@@ -120,10 +121,62 @@ const add = async (req, res) => {
     } catch (error) {
         console.log(error);
         return res.status(statusCode.BAD_REQUEST).json({ message: error.message });
-        throw new Error(error.message);
     }
 }
 
+
+const getUserExpense = async (req, res) => {
+    try {
+        const response = [];
+        const { userId } = req.params;
+        const { skip = 0, limit = 10 } = req.query;
+        if (!userId) {
+            return res.status(statusCode.OK).json({ data: response });
+        }
+
+        const expense = await fetchUserExpenses(userId, skip, limit);
+
+        for (const e of expense) {
+            const obj = {
+                totalExpense: e.userDetails[userId]["expense"],
+                transactions: [],
+                singleUser: e.singleUser
+            }
+
+            let users = [];
+            for (const t in e.userDetails[userId]) {
+                if (t === "expense") continue;
+                users.push(t);
+            }
+
+            users = await User.find({ _id: { "$in": users } }, { userName: 1 });
+
+
+            for (const t in e.userDetails[userId]) {
+                if (t === "expense") continue;
+                const userName = users.find((u) => u._doc._id == t);
+                if (e.userDetails[userId][t] < 0) {
+                    obj.transactions.push({
+                        amount: e.userDetails[userId][t],
+                        message: `You owe ${Math.abs(e.userDetails[userId][t])} to ${userName._doc.userName}`
+                    })
+                } else if (e.userDetails[userId][t] > 0) {
+                    obj.transactions.push({
+                        amount: e.userDetails[userId][t],
+                        message: `You get back ${e.userDetails[userId][t]} from ${userName._doc.userName}`
+                    })
+                }
+            }
+            response.push(obj);
+        }
+
+        return res.status(statusCode.OK).json({ data: response });
+
+    } catch (error) {
+        console.log(error);
+        return res.status(statusCode.BAD_REQUEST).json({ message: error.message });
+    }
+}
 
 /**
  * Calculate amount for individual
@@ -178,6 +231,22 @@ function checkIfUsersExistInTheGroup(payers, groupMembers) {
     }
 }
 
+async function fetchUserExpenses(userId, skip, limit) {
+    return  new Promise((resolve,reject) => {
+        Expense.find({
+            [userId]: {
+                "$exists": true
+            },
+        },{},{ skip:Number(skip), limit:Number(limit) },(err,docs) => {
+            if(err) {
+                reject(err);
+            } else {
+                resolve(docs);
+            }
+        }).sort({createdAt:-1})
+    })
+}
+
 module.exports = {
-    add
+    add, getUserExpense
 }

@@ -8,4 +8,9 @@ const validate = require('../middleware/validate');
 */
 router.post('/add', validate('addExpense') ,Expense.add);
 
+/** 
+* @route      GET /api/expense/user/:userId
+*/
+router.get('/user/:userId', Expense.getUserExpense);
+
 module.exports = router;
