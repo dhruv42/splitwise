@@ -13,11 +13,19 @@ const add = async (req, res) => {
 
         // single user transaction
         if (singleUser) {
-            const payerId = payers.find((user) => user !== payee);
-
+            let payerIndex, payerId;
+            for(let i=0; i<payers.length; i++) {
+                if(payers[i]!==payee) {
+                    payerIndex = i;
+                    payerId = payers[i];
+                    break;
+                }
+            }
+            
             let payerAmount = (amount / 2);
             if (percentageSplit.length) {
-                payerAmount = (amount * percentageSplit[1]) / 100;
+                let payerPercentage = percentageSplit[payerIndex];
+                payerAmount = (amount * payerPercentage) / 100;
             }
 
             expense = await Expense.findOne({
