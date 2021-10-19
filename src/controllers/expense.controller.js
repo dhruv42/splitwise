@@ -6,7 +6,9 @@ const { messages, statusCode } = require('../constants');
 
 const add = async (req, res) => {
     try {
-        const { groupId, payee, amount, splitEqually, payers, percentageSplit = [], singleUser } = req.body;
+        const { groupId, payee, amount, splitEqually, payers, percentageSplit = [] } = req.body;
+        let { singleUser } = req.query;
+        singleUser = (singleUser && singleUser === "true" ? true : false);
         let expense = {}, group;
 
         // single user transaction
@@ -20,10 +22,10 @@ const add = async (req, res) => {
 
             expense = await Expense.findOne({
                 singleUser: true,
-                [payee]: {
+                [`userDetails.${payee}`]: {
                     "$exists": true
                 },
-                [payerId]: {
+                [`userDetails.${payerId}`]: {
                     "$exists": true
                 },
             });
@@ -138,6 +140,7 @@ const getUserExpense = async (req, res) => {
 
         for (const e of expense) {
             const obj = {
+                expenseId:e.id,
                 totalExpense: e.userDetails[userId]["expense"],
                 transactions: [],
                 singleUser: e.singleUser
@@ -234,9 +237,9 @@ function checkIfUsersExistInTheGroup(payers, groupMembers) {
 async function fetchUserExpenses(userId, skip, limit) {
     return  new Promise((resolve,reject) => {
         Expense.find({
-            [userId]: {
+            [`userDetails.${userId}`]:{
                 "$exists": true
-            },
+            }
         },{},{ skip:Number(skip), limit:Number(limit) },(err,docs) => {
             if(err) {
                 reject(err);

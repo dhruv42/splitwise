@@ -18,8 +18,8 @@ const allSchemas = {
         payee: Joi.string().trim().required(),
         payers: Joi.array().items(Joi.string()).min(2),
         percentageSplit: Joi.array().items(Joi.number()),
-        singleUser: Joi.boolean().required(),
-        splitEqually: Joi.boolean().required()
+        splitEqually: Joi.boolean().required(),
+        groupId:Joi.string().allow(null)
     })
 }
 

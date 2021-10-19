@@ -17,7 +17,13 @@ const add = async (req, res) => {
         }
 
         await Expense.create(expenseObject);
-        return res.status(statusCode.OK).json({ message: 'group added successfully' });
+        return res.status(statusCode.OK).json({ 
+            message: 'group added successfully',
+            data:{
+                id:createdGroup.id,
+                name:createdGroup.name
+            }
+        });
     } catch (error) {
         throw new Error(error.message);
     }
