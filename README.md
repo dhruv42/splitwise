@@ -18,3 +18,6 @@ config.json content,
 
 We are all set to run our project, type the below command
 >npm start
+
+
+To import the APIs, import `Splitwise.postman_collection.json` file in postman.
